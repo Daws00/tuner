@@ -45,7 +45,7 @@ import be.tarsos.dsp.pitch.PitchDetectionResult;
 import be.tarsos.dsp.pitch.PitchProcessor;
 import be.tarsos.dsp.pitch.PitchProcessor.PitchEstimationAlgorithm;
 
-public class PitchDetectorExample implements PitchDetectionHandler {
+public class PitchDetector implements PitchDetectionHandler {
 
 	/**
 	 * 
@@ -56,7 +56,7 @@ public class PitchDetectorExample implements PitchDetectionHandler {
 	
 	private float pitch;
 
-	public PitchDetectorExample() {
+	public PitchDetector() {
 		try {
 			setNewMixer(AudioSystem.getMixer(Shared.getMixerInfo(false, true).lastElement()));
 		} catch(LineUnavailableException e) {
@@ -108,20 +108,13 @@ public class PitchDetectorExample implements PitchDetectionHandler {
 	}
 
 	public static void main(String... strings) throws InterruptedException, InvocationTargetException {
-		System.out.println("wubba");
+		System.out.println("wubba lubba dub dub!");
 		EventQueue.invokeAndWait(new Runnable() {
 			public void run() {
-				new PitchDetectorExample();
-				Runtime runTime = Runtime.getRuntime();
-				try {
-					runTime.exec("gpio mode 1 pwm");
-					runTime.exec("gpio pwm-ms");
-					runTime.exec("gpio pwmc 192"); 
-					runTime.exec("gpio pwmr 2000"); 
-					runTime.exec("gpio pwm 1 152"); // ~center
-				} catch (Exception e) {
-		            System.out.println("Exception occured: " + e.getMessage());
-		        }
+				PitchDetector detector = new PitchDetector();
+				GPIOServoController controller = new GPIOServoController(detector);
+				Thread thread = new Thread(controller);
+				thread.start();
 			}
 		});
 	}
