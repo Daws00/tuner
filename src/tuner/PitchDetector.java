@@ -1,32 +1,8 @@
-/*
-*      _______                       _____   _____ _____  
-*     |__   __|                     |  __ \ / ____|  __ \ 
-*        | | __ _ _ __ ___  ___  ___| |  | | (___ | |__) |
-*        | |/ _` | '__/ __|/ _ \/ __| |  | |\___ \|  ___/ 
-*        | | (_| | |  \__ \ (_) \__ \ |__| |____) | |     
-*        |_|\__,_|_|  |___/\___/|___/_____/|_____/|_|     
-*                                                         
-* -------------------------------------------------------------
-*
-* TarsosDSP is developed by Joren Six at IPEM, University Ghent
-*  
-* -------------------------------------------------------------
-*
-*  Info: http://0110.be/tag/TarsosDSP
-*  Github: https://github.com/JorenSix/TarsosDSP
-*  Releases: http://0110.be/releases/TarsosDSP/
-*  
-*  TarsosDSP includes modified source code by various authors,
-*  for credits and info, see README.
-* 
-*/
-
-
 package tuner;
 
+import java.awt.Color;
+import java.awt.Dimension;
 import java.lang.reflect.InvocationTargetException;
-
-import java.awt.EventQueue;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -36,6 +12,8 @@ import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.Mixer;
 import javax.sound.sampled.TargetDataLine;
 import javax.sound.sampled.UnsupportedAudioFileException;
+import javax.swing.SwingUtilities;
+import javax.swing.JFrame;
 
 import be.tarsos.dsp.AudioDispatcher;
 import be.tarsos.dsp.AudioEvent;
@@ -52,11 +30,17 @@ public class PitchDetector implements PitchDetectionHandler {
 	 */
 
 	private AudioDispatcher dispatcher;
-	private PitchEstimationAlgorithm algo = PitchEstimationAlgorithm.MPM;	
+	private PitchEstimationAlgorithm algo;
+	
+	private static DataHandler dataHandler;
+	
+	private JFrame frame;
 	
 	private float pitch;
 
 	public PitchDetector() {
+		algo = PitchEstimationAlgorithm.MPM;
+		
 		try {
 			setNewMixer(AudioSystem.getMixer(Shared.getMixerInfo(false, true).lastElement()));
 		} catch(LineUnavailableException e) {
@@ -68,7 +52,12 @@ public class PitchDetector implements PitchDetectionHandler {
 			e.printStackTrace();
 		}
 		
-		algo = PitchEstimationAlgorithm.YIN;
+		frame = new JFrame();
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.getContentPane().setPreferredSize(new Dimension(500, 500));
+		frame.getContentPane().setBackground(Color.RED);
+		frame.pack();
+		frame.setVisible(true);
 	}
 
 	
@@ -109,8 +98,9 @@ public class PitchDetector implements PitchDetectionHandler {
 
 	public static void main(String... strings) throws InterruptedException, InvocationTargetException {
 		System.out.println("wubba lubba dub dub!");
-		EventQueue.invokeAndWait(new Runnable() {
+		SwingUtilities.invokeAndWait(new Runnable() {
 			public void run() {
+				dataHandler = new DataHandler("data.csv");
 				PitchDetector detector = new PitchDetector();
 				GPIOServoController controller = new GPIOServoController(detector);
 				Thread thread = new Thread(controller);
@@ -122,16 +112,29 @@ public class PitchDetector implements PitchDetectionHandler {
 	public float getPitch() {
 		return pitch;
 	}
-
+	
+	public void inTune(boolean inTune) {
+		if(inTune) {
+			this.frame.getContentPane().setBackground(Color.GREEN);
+			this.frame.revalidate();
+			this.frame.repaint();
+		}
+	}
+	
 	@Override
 	public void handlePitch(PitchDetectionResult pitchDetectionResult,AudioEvent audioEvent) {
 		if(pitchDetectionResult.getPitch() != -1){
-			double timeStamp = audioEvent.getTimeStamp();
-			float pitch = pitchDetectionResult.getPitch();
-			this.pitch = pitch;
 			float probability = pitchDetectionResult.getProbability();
-			double rms = audioEvent.getRMS() * 100;
-			System.out.printf("Pitch detected at %.2fs: %.2fHz ( %.2f probability, RMS: %.5f )\n", timeStamp,pitch,probability,rms);
+			if(probability >= 0.95) {
+				double timeStamp = audioEvent.getTimeStamp();
+				float pitch = pitchDetectionResult.getPitch();
+				this.pitch = pitch;
+				
+				dataHandler.write(new Pitch(timeStamp, pitch));
+				
+				double rms = audioEvent.getRMS() * 100;
+				System.out.printf("Pitch detected at %.2fs: %.2fHz ( %.2f probability, RMS: %.5f )\n", timeStamp,pitch,probability,rms);
+			}
 		}
 	}
 }
