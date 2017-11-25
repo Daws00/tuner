@@ -123,12 +123,12 @@ public class PitchDetector implements PitchDetectionHandler {
 	
 	@Override
 	public void handlePitch(PitchDetectionResult pitchDetectionResult,AudioEvent audioEvent) {
-		if(pitchDetectionResult.getPitch() != -1){
-			float probability = pitchDetectionResult.getProbability();
-			if(probability >= 0.95) {
+		float probability = pitchDetectionResult.getProbability();
+		if(probability >= 0.95) {
+			float pitch = pitchDetectionResult.getPitch();
+			this.pitch = pitch;
+			if(pitch != -1){
 				double timeStamp = audioEvent.getTimeStamp();
-				float pitch = pitchDetectionResult.getPitch();
-				this.pitch = pitch;
 				
 				dataHandler.write(new Pitch(timeStamp, pitch));
 				

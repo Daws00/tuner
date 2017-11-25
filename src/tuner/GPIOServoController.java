@@ -2,15 +2,15 @@ package tuner;
 
 import java.lang.Runnable;
 
-/*import com.pi4j.io.gpio.GpioController;
+import com.pi4j.io.gpio.GpioController;
 import com.pi4j.io.gpio.GpioFactory;
 import com.pi4j.io.gpio.GpioPinDigitalOutput;
 import com.pi4j.io.gpio.PinState;
-import com.pi4j.io.gpio.RaspiPin;*/
+import com.pi4j.io.gpio.RaspiPin;
 
 public class GPIOServoController implements Runnable {
-	//private GpioController gpioFactory;
-    //private GpioPinDigitalOutput pin;
+	private GpioController gpioFactory;
+    private GpioPinDigitalOutput pin;
     
     private long period = 20000000;
     
@@ -19,10 +19,10 @@ public class GPIOServoController implements Runnable {
     int position = 90;
     
     public GPIOServoController(PitchDetector detector) {
-    		//this.gpioFactory = GpioFactory.getInstance();
-    		//this.pin = gpioFactory.provisionDigitalOutputPin(RaspiPin.GPIO_07, PinState.LOW);
+    		this.gpioFactory = GpioFactory.getInstance();
+    		this.pin = gpioFactory.provisionDigitalOutputPin(RaspiPin.GPIO_07, PinState.LOW);
     		
-    		//pin.setShutdownOptions(true, PinState.LOW);
+    		pin.setShutdownOptions(true, PinState.LOW);
     		
     		this.detector = detector;
     		
@@ -32,13 +32,13 @@ public class GPIOServoController implements Runnable {
     			long upStart = System.nanoTime();
     			long duty = angleToDuty(90);
     			while(upStart + duty > System.nanoTime()) {
-    				//pin.high();
+    				pin.high();
     			}
     			
-    			long downStart = System.nanoTime();
+    			long lowStart = System.nanoTime();
     			long rest = period - duty;
-    			while(downStart + rest > System.nanoTime()) {
-    				//pin.low();
+    			while(lowStart + rest > System.nanoTime()) {
+    				pin.low();
     			}
     		}
     }
@@ -48,31 +48,33 @@ public class GPIOServoController implements Runnable {
     }
     
     private void turn() {
-    		long start = System.currentTimeMillis();
-    		long end = 500;
-    		while(start + end > System.currentTimeMillis()) {
-	    		long upStart = System.nanoTime();
-	    		long duty = angleToDuty(position);
-	    		while(upStart + duty > System.nanoTime()) {
-	    			//pin.high();
-	    		}
+	    	long start = System.currentTimeMillis();
+	    	long end = 500;
+	    	while(start + end > System.currentTimeMillis()) {
+		    	long highStart = System.nanoTime();
+		    	long duty = angleToDuty(position);
+		   		pin.high();
+		   		while(highStart + duty > System.nanoTime()) {
+		   			
+		   		}
 	    		
-	    		long downStart = System.nanoTime();
-	    		long rest = period - duty;
-	    		while(downStart + rest > System.nanoTime()) {
-	    			//pin.low();
-	    		}
-	    		
+		    	long lowStart = System.nanoTime();
+		    	long rest = period - duty;
+		   		pin.low();
+		   		while(lowStart + rest > System.nanoTime()) {
+		   			
+		   		}
 	    	}
     }
     
-    @Override
 	public void run() {
-    		while(true) {
-    			changePosition(detector.getPitch());
-    			
-    			turn();
-    		}
+	    	while(true) {
+	    		if(detector.getPitch() != -1) {
+		    		changePosition(detector.getPitch());
+		    		System.out.println(position);
+		    		turn();
+		    	}
+	    	}
 	}
 	
     private void changePosition(float pitch) {
