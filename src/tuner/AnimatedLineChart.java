@@ -1,4 +1,4 @@
-package tuner;
+/*package tuner;
 
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
@@ -137,4 +137,4 @@ public class AnimatedLineChart extends Application {
     public static void main(String[] args) {
         launch(args);
     }
-}
+}*/

@@ -10,6 +10,7 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.DataLine;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.Mixer;
+import javax.sound.sampled.Mixer.Info;
 import javax.sound.sampled.TargetDataLine;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.SwingUtilities;
@@ -26,7 +27,10 @@ import be.tarsos.dsp.pitch.PitchProcessor.PitchEstimationAlgorithm;
 public class PitchDetector implements PitchDetectionHandler {
 
 	/**
-	 * 
+	 * E5 - 659.3
+	 * A4 - 440
+	 * D4 - 293.7
+	 * G3 - 196
 	 */
 
 	private AudioDispatcher dispatcher;
@@ -37,12 +41,13 @@ public class PitchDetector implements PitchDetectionHandler {
 	private JFrame frame;
 	
 	private float pitch;
+	private boolean test = false;
 
 	public PitchDetector() {
 		algo = PitchEstimationAlgorithm.MPM;
 		
 		try {
-			setNewMixer(AudioSystem.getMixer(Shared.getMixerInfo(false, true).lastElement()));
+			setNewMixer(AudioSystem.getMixer((Info) Shared.getMixerInfo(false, true).firstElement()));
 		} catch(LineUnavailableException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -121,16 +126,31 @@ public class PitchDetector implements PitchDetectionHandler {
 		}
 	}
 	
-	@Override
+	public void reset(boolean shouldReset) {
+		if(shouldReset) {
+			setFrameColor(Color.BLUE);
+		} else {
+			setFrameColor(Color.RED);
+		}
+	}
+	
+	private void setFrameColor(Color color) {
+		this.frame.getContentPane().setBackground(color);
+		this.frame.revalidate();
+		this.frame.repaint();
+	}
+	
 	public void handlePitch(PitchDetectionResult pitchDetectionResult,AudioEvent audioEvent) {
 		float probability = pitchDetectionResult.getProbability();
-		if(probability >= 0.95) {
+		if(probability >= 0.99) {
 			float pitch = pitchDetectionResult.getPitch();
 			this.pitch = pitch;
 			if(pitch != -1){
 				double timeStamp = audioEvent.getTimeStamp();
 				
-				dataHandler.write(new Pitch(timeStamp, pitch));
+				if(!test) {
+					dataHandler.write(new Pitch(timeStamp, pitch));
+				}
 				
 				double rms = audioEvent.getRMS() * 100;
 				System.out.printf("Pitch detected at %.2fs: %.2fHz ( %.2f probability, RMS: %.5f )\n", timeStamp,pitch,probability,rms);

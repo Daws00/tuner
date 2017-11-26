@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="lib" path="/Users/dawson/eclipse-workspace/tuner/lib/TarsosDSP-latest.jar"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER">
+	<classpathentry kind="lib" path="/home/pi/Workspace/tuner/lib/TarsosDSP-latest.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5">
 		<attributes>
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="/Users/dawson/eclipse-workspace/tuner/lib/pi4j-core.jar"/>
+	<classpathentry kind="lib" path="/home/pi/Downloads/pi4j-1.2-SNAPSHOT/lib/pi4j-core.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
