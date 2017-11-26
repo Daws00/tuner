@@ -1,15 +1,20 @@
 package tuner;
 
 public class Pitch {
-	private double time;
-	private float pitch;
+	private Double time;
+	private Float pitch;
 	
 	public Pitch(double time, float pitch) {
 		this.time = time;
 		this.pitch = pitch;
 	}
 	
-	public double getTime() {
+	public Pitch() {
+		time = null;
+		pitch = null;
+	}
+	
+	public Double getTime() {
 		return time;
 	}
 	
@@ -17,7 +22,7 @@ public class Pitch {
 		this.time = time;
 	}
 	
-	public float getPitch() {
+	public Float getPitch() {
 		return pitch;
 	}
 	

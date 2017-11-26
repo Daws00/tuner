@@ -106,6 +106,7 @@ public class PitchDetector implements PitchDetectionHandler {
 		SwingUtilities.invokeAndWait(new Runnable() {
 			public void run() {
 				dataHandler = new DataHandler("data.csv");
+				dataHandler.write(new Pitch());
 				PitchDetector detector = new PitchDetector();
 				GPIOServoController controller = new GPIOServoController(detector);
 				Thread thread = new Thread(controller);
