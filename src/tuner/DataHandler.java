@@ -18,10 +18,17 @@ public class DataHandler {
 		BufferedWriter bw = null;
 		try {
 			bw = new BufferedWriter(new FileWriter(FILE_NAME, true));
-			bw.write(String.valueOf(pitch.getTime()));
-			bw.write(COMMA_DELIMITER);
-			bw.write(String.valueOf(pitch.getPitch()));
-			bw.write(NEW_LINE_DELIMITER);
+			Double t = pitch.getTime();
+			Float p = pitch.getPitch();
+			if(t.equals(null) || p.equals(null)) {
+				bw.write(COMMA_DELIMITER);
+				bw.write(NEW_LINE_DELIMITER);
+			} else {
+				bw.write(String.valueOf(pitch.getTime()));
+				bw.write(COMMA_DELIMITER);
+				bw.write(String.valueOf(pitch.getPitch()));
+				bw.write(NEW_LINE_DELIMITER);
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
