@@ -41,7 +41,7 @@ public class PitchDetector implements PitchDetectionHandler {
 	private JFrame frame;
 	
 	private float pitch;
-	private boolean test = true;
+	private boolean test = false;
 
 	public PitchDetector() {
 		algo = PitchEstimationAlgorithm.MPM;
