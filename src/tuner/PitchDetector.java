@@ -41,7 +41,7 @@ public class PitchDetector implements PitchDetectionHandler {
 	private JFrame frame;
 	
 	private float pitch;
-	private boolean test = false;
+	private boolean test = true;
 
 	public PitchDetector() {
 		algo = PitchEstimationAlgorithm.MPM;
@@ -105,8 +105,7 @@ public class PitchDetector implements PitchDetectionHandler {
 		System.out.println("wubba lubba dub dub!");
 		SwingUtilities.invokeAndWait(new Runnable() {
 			public void run() {
-				dataHandler = new DataHandler("data.csv");
-				dataHandler.write(new Pitch());
+				dataHandler = new DataHandler("a4_test.csv");
 				PitchDetector detector = new PitchDetector();
 				GPIOServoController controller = new GPIOServoController(detector);
 				Thread thread = new Thread(controller);
