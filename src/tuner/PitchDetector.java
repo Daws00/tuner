@@ -140,12 +140,20 @@ public class PitchDetector implements PitchDetectionHandler {
 		this.frame.repaint();
 	}
 	
+	private boolean withinLimits(float pitch) {
+		if(pitch > 410 && pitch < 470 || pitch > 263.7 && pitch < 323.7 || pitch > 166 && pitch < 226 || pitch > 629.3 && pitch < 689.3) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
 	public void handlePitch(PitchDetectionResult pitchDetectionResult,AudioEvent audioEvent) {
 		float probability = pitchDetectionResult.getProbability();
 		if(probability >= 0.99) {
 			float pitch = pitchDetectionResult.getPitch();
 			this.pitch = pitch;
-			if(pitch != -1){
+			if(withinLimits(pitch)){
 				double timeStamp = audioEvent.getTimeStamp();
 				
 				if(!test) {
